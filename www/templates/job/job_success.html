@@ -23,8 +23,8 @@
             职位发布成功啦！
         </div>
 
-        <div style="width: 220px;margin: 10px auto;text-align: center;line-height: 30px;font-size: 14px;color: #bebebe;font-family: Mcrosoft Yahei;">
-            快将你发布的职位信息分享出去，让更多的人帮助你来做推荐吧！
+        <div style="width: 200px;margin: 10px auto;text-align: center;line-height: 30px;font-size: 14px;color: #bebebe;font-family: Mcrosoft Yahei;">
+            快发给你的同事，同学，朋友，求他们推荐吧！
         </div>
 
         <div class="weui-row" style="margin: 40px 25px;;">
@@ -64,32 +64,31 @@
         ] // 必填，需要使用的JS接口列表，所有JS接口列表见附录2
     });
     wx.ready(function () {
-        wx.onMenuShareAppMessage({
-            title: '荐人不矫情', // 分享标题
-            desc: '杨启华向你推荐了深圳腾讯科技Java工程师，快来看看吧！', // 分享描述
-            link: 'http://wx.jian-hu.cn/job/get_job', // 分享链接
-            imgUrl: 'http://res.jian-hu.cn/static/img/fasong@2x.png', // 分享图标
-            type: '', // 分享类型,music、video或link，不填默认为link
-            dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
-            success: function () {
-                // 用户确认分享后执行的回调函数
-                // $.toast("分享成功");
-                // location.href = "/";
-            },
-            cancel: function () {
-                // 用户取消分享后执行的回调函数
-                $.toast("分享失败");
-            }
-        });
-
         wx.onMenuShareTimeline({
             title: '分享标题', // 分享标题
             link: 'http://wx.jian-hu.cn/job/get_job', // 分享链接
             imgUrl: 'http://res.jian-hu.cn/static/img/fasong@2x.png', // 分享图标
             success: function () {
                 // 用户确认分享后执行的回调函数
-                // $.toast("分享成功");
-                // location.href = "/";
+                $.toast("分享成功");
+{#                location.href = "/";#}
+            },
+            cancel: function () {
+                // 用户取消分享后执行的回调函数
+                $.toast("分享失败");
+            }
+        });
+        wx.onMenuShareAppMessage({
+            title: '荐人不矫情,荐乎-用语音荐人！', // 分享标题
+            desc: '深圳腾讯科技杨启华求你推荐Java工程师，快来看看吧！', // 分享描述
+            link: 'http://wx.jian-hu.cn/job/get_job', // 分享链接
+            imgUrl: 'http://res.jian-hu.cn/static/img/fasong@2x.png', // 分享图标
+            type: '', // 分享类型,music、video或link，不填默认为link
+            dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
+            success: function () {
+                // 用户确认分享后执行的回调函数
+                $.toast("分享成功");
+{#                location.href = "/";#}
             },
             cancel: function () {
                 // 用户取消分享后执行的回调函数
@@ -103,13 +102,13 @@
                     text: "朋友圈",
                     className: "bg-primary",
                     onClick: function () {
-                        
+
                     }
                 }, {
                     className: "bg-success",
                     text: "微信好友",
                     onClick: function () {
-                        
+
                     }
                 }]
             });

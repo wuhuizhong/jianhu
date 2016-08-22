@@ -4,5 +4,5 @@ settings.py
 
 log/
 
-www/.idea/
+www/.idea/workspace.xml
 www/*.pyc
