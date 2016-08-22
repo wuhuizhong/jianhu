@@ -32,7 +32,7 @@
                     <td rowspan="2">
                         <a href="/user/edit_userinfo">
                             <div class="jian-me-edit">
-                                修改
+                                编辑
                             </div>
                         </a>
                     </td>
@@ -109,13 +109,13 @@
             </div>
         </a>
 
-{#        <div style="margin: 40px 15px">#}
-{#            <a href="/">#}
-{#                <div style="width: 150px;text-align: center;border: 1px solid #8e8e8e;font-size: 18px;color: #8e8e8e;margin: 10px auto;padding: 8px;border-radius: 6px;">#}
-{#                    退出登录#}
-{#                </div>#}
-{#            </a>#}
-{#        </div>#}
+        {#        <div style="margin: 40px 15px">#}
+        {#            <a href="/">#}
+        {#                <div style="width: 150px;text-align: center;border: 1px solid #8e8e8e;font-size: 18px;color: #8e8e8e;margin: 10px auto;padding: 8px;border-radius: 6px;">#}
+        {#                    退出登录#}
+        {#                </div>#}
+        {#            </a>#}
+        {#        </div>#}
 
     </div>
 
@@ -141,15 +141,47 @@
         </a>
     </div>
 </div>
+<div id="about" class="weui-popup-container">
+    <div class="weui-popup-overlay"></div>
+    <div class="weui-popup-modal">
+        你的内容放在这里...
+        你的内容放在这里...你的内容放在这里...
+        你的内容放在这里...
+        你的内容放在这里...
+        你的内容放在这里...
+
+
+        <div style="margin: 40px 15px">
+            <div id="close_popup"
+                 style="width: 150px;text-align: center;border: 1px solid #8e8e8e;font-size: 18px;color: #8e8e8e;margin: 10px auto;padding: 8px;border-radius: 6px;">
+                关闭
+            </div>
+        </div>
+    </div>
+</div>
+{#<div id="about" class="weui-popup-container popup-bottom">#}
+{#    <div class="weui-popup-overlay"></div>#}
+{#    <div class="weui-popup-modal">#}
+{#        #}
+{#    </div>#}
+{#</div>#}
 <script src="http://res.jian-hu.cn/static/jquery-weui/dist/lib/jquery-2.1.4.js"></script>
 <script src="http://res.jian-hu.cn/static/jquery-weui/dist/js/jquery-weui.js"></script>
 <script src="http://res.jian-hu.cn/static/dist/js/app-me.js"></script>
 <script type="text/javascript">
-    var user = {{ user | safe }}
+    var user = {{ user | safe }};
     $('#user_name').text(user.nick);
     $('#user_company').text(user.company);
     $('#user_addr').text(user.city);
     $('#user_portrait').attr('src', user.portrait);
+
+    $('#user_portrait').on('click', function (event) {
+        $("#about").popup();
+    });
+    $('#close_popup').on('click', function (event) {
+        $.closePopup();
+    });
+
 </script>
 </body>
 </html>

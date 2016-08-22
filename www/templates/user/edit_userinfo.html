@@ -39,7 +39,8 @@
                     <div class="weui_cell jian-form-cell">
                         <div class="weui_cell_hd jian-cell-hd"><label class="weui_label">所在公司</label></div>
                         <div class="weui_cell_bd weui_cell_primary jian-form-cell-body">
-                            <input class="weui_input" name="company_name" id="company_name" type="text" placeholder="请输入所在公司">
+                            <input class="weui_input" name="company_name" id="company_name" type="text"
+                                   placeholder="请输入所在公司">
                         </div>
                     </div>
                     <div class="weui_cell jian-form-cell">
@@ -53,7 +54,18 @@
                         <div class="weui_cell_hd" style="width: 145px;">
                             <label class="weui_label">所在城市</label></div>
                         <div class="weui_cell_bd weui_cell_primary jian-form-cell-body">
-                            <input class="weui_input" name="city" type="text" id='city-picker' value="北京 北京市"/>
+                            <input class="weui_input" name="city" type="text" id='city-picker' value="北京 北京市 东城区 "/>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="weui_cells_title">微简历（可选填）</div>
+                <div class="weui_cells weui_cells_form" style="margin:0 12px;">
+                    <div class="weui_cell">
+                        <div class="weui_cell_bd weui_cell_primary">
+                            <textarea class="weui_textarea" placeholder="主要技能，主要业绩，工作经历，教育背景等" rows="3"></textarea>
+
+                            <div class="weui_textarea_counter"><span>0</span>/200</div>
                         </div>
                     </div>
                 </div>
@@ -81,19 +93,25 @@
     $('#tint').text(info.tint);
 
     $('#info_submit').on('click', function (event) {
-        if($('#real_name').val()==''){
-            $.toast("请输入真实姓名","text");
+        if ($('#real_name').val() == '') {
+            $.toast("快发给你的同事，同学，朋友，求推荐吧！", "text");
             return;
         }
-        if($('#company_name').val()==''){
-            $.toast( "请输入所在公司","text");
+        if ($('#company_name').val() == '') {
+            $.toast("请输入所在公司", "text");
             return;
         }
-        if($('#user_title').val()==''){
-            $.toast("请输入您的职位","text");
+        if ($('#user_title').val() == '') {
+            $.toast("请输入您的职位", "text");
             return;
         }
         $('#info_form').submit();
+    });
+
+    // edit-user.info.js
+    $("#city-picker").cityPicker({
+        showDistrict: true
+
     });
 </script>
 

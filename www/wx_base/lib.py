@@ -194,11 +194,11 @@ class HttpClient(Singleton, BaseHttpClient):
 def WeixinApiDealResultWrapper(func):
     def deal_result(*args, **kw):  
         result = func(*args, **kw) 
-	try:
-        	decodejson = json.loads(result)
+        try:
+            decodejson = json.loads(result)
         except Exception,e:  
-		logging.error("Error Ret: %s   Exception: %s" % (result, e))
-	
+            logging.error("Error Ret: %s   Exception: %s" % (result, e))
+    
         if ('errcode' in decodejson) and (decodejson['errcode'] > 0):
             logging.error('[WXAPI]Error: %s' % result)
             if decodejson['errcode'] == 40001:

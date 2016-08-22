@@ -29,7 +29,7 @@ def fetch_user_info_callback(openid, userinfo):
                 sex = 'F'
 
         profile = Profile(uuid=gen_uuid(), nick=userinfo['nickname'], sex=sex, portrait=userinfo['headimgurl'],
-            real_name='', company_name='', title='', vip='')
+            real_name='', company_name='', title='', vip='1')
         profile.save()
 
         bind = Bind(user_id=profile.id, phone_number='', phone_number_verify_time='1972-01-01', wx_openid=openid,
