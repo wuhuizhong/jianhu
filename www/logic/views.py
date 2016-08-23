@@ -29,9 +29,7 @@ def index(request):
 	number_limit = convert.str_to_int(request.GET.get('limit', '10'), 10)  # 异常情况下，或者不传的情况下，默认为10
 	own_job = {}
 	# 取本人发布过的，并且有效的简历
-	if vip_job_from_point != 0:  # 不是首页的话，翻页不需要继续找own_job了
-		own_job = []
-	else:  # 首页
+	if vip_job_from_point == 0:  # 这里是首页；如果大于0就不是首页，不是首页的话，翻页不需要继续找own_job了
 		own_jobs = Job.objects.filter(user_id=user_id).order_by('-id')[:1]
 		if own_jobs:
 			own_job_obj = own_jobs[0]
@@ -81,13 +79,12 @@ def get_job(request):
 
 	page_data = {}
 	job_uuid = request.GET.get('job_uuid', '')
-	job_detail = Job.objects.filter(uuid=job_uuid)[0]
-	print job_detail
-	if job_detail:
-		page_data = model_to_dict(job_detail, exclude=['id', 'user_id', 'is_valid', 'create_time', 'update_time', ])
-		page_data['time'] = convert.format_time(job_detail.create_time)
-		page_data['city'] = job_detail.city + " " + job_detail.district
-		profile = Profile.objects.filter(id=job_detail.user_id)[0]
+	job_details = Job.objects.filter(uuid=job_uuid)[:1]
+	if job_details:
+		page_data = model_to_dict(job_details[0], exclude=['id', 'user_id', 'is_valid', 'create_time', 'update_time', ])
+		page_data['time'] = convert.format_time(job_details[0].create_time)
+		page_data['city'] = job_details[0].city + " " + job_details[0].district
+		profile = get_user_profile_by_user_id(user_id=user_id, need_default=True)
 		page_data['username'] = profile.real_name
 		page_data['portrait'] = profile.portrait
 	else:
@@ -172,15 +169,10 @@ def fabu_job(request):
 		logging.error('Cant find user_id by openid: %s when post_job' % request.openid)
 		return HttpResponse("十分抱歉，获取用户信息失败，请重试。重试失败请联系客服人员")
 
-	job_details = Job.objects.filter(user_id=user_id)[:1]
-	if not job_details:
-		return HttpResponse("十分抱歉，获取失败,请联系客服人员")
-
-	job_detail = job_details[0]
-
 	page_data = {}
-	if job_detail:
-		page_data = model_to_dict(job_detail, exclude=['is_vip', 'is_valid', 'update_time', 'create_time'])
+	job_details = Job.objects.filter(user_id=user_id)[:1]
+	if job_details:
+		page_data = model_to_dict(job_detail[0], exclude=['is_vip', 'is_valid', 'update_time', 'create_time'])
 
 	url = "http://" + request.get_host() + request.path
 	sign = Helper.jsapi_sign(url)
