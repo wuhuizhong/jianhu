@@ -88,7 +88,7 @@ def get_job(request):
 		page_data['username'] = profile.real_name
 		page_data['portrait'] = profile.portrait
 	else:
-		logging.error("uid(%s) try to get not exsit job(%s), maybe attack" % (uid, job_uuid))
+		logging.error("uid(%s) try to get not exsit job(%s), maybe attack" % (user_id, job_uuid))
 		return HttpResponse("十分抱歉，获取用户信息失败，请重试。重试失败请联系客服人员")
 
 	url = "http://" + request.get_host() + request.path
