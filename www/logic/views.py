@@ -34,15 +34,15 @@ def index(request):
 	else:  # 首页
 		own_jobs = Job.objects.filter(user_id=user_id).order_by('-id')[:1]
 		if own_jobs:
-			own_job = own_jobs[0]
-			own_job['city'] = own_job.city + " " + own_job.district
-			own_job['company_name'] = own_job.company_name
-			own_job['job_title'] = own_job.job_title
-			own_job['education'] = own_job.education
-			own_job['work_experience'] = own_job.work_experience
-			own_job['salary'] = own_job.salary
-			own_job['create_time'] = convert.format_time(own_job.create_time)
-			own_job['job_uuid'] = own_job.uuid
+			own_job_obj = own_jobs[0]
+			own_job['city'] = own_job_obj.city + " " + own_job_obj.district
+			own_job['company_name'] = own_job_obj.company_name
+			own_job['job_title'] = own_job_obj.job_title
+			own_job['education'] = own_job_obj.education
+			own_job['work_experience'] = own_job_obj.work_experience
+			own_job['salary'] = own_job_obj.salary
+			own_job['create_time'] = convert.format_time(own_job_obj.create_time)
+			own_job['job_uuid'] = own_job_obj.uuid
 			own_job['username'] = profile.real_name
 			own_job['portrait'] = profile.portrait
 
