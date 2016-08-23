@@ -34,12 +34,12 @@
                     </div>
 
                     <div class="weui-row weui-no-gutter jian-item-content">
-                        <div class="weui-col-33">
+                        <div class="weui-col-32">
                             <img class="jian-item-content-img"
                                  src="http://res.jian-hu.cn/static/img/icn_place@2x.png"><font
                                 class="jian-item-content-fontyahei">{{ city }}</font>
                         </div>
-                        <div class="weui-col-23" style="padding-left: 7px;">
+                        <div class="weui-col-24" style="padding-left: 4px;">
                             <img src="http://res.jian-hu.cn/static/img/icn_time@2x.png"
                                  class="jian-item-content-img"><font
                                 class="jian-item-content-fontyahei">{{ work_experience }}</font>
@@ -54,44 +54,38 @@
                         </div>
                     </div>
 
-                    <div class="weui-row weui-no-gutter jian-item-skill">
+                    <div class="weui-row jian-item-skill">
                         <div class="weui-col-33">
-                            <div style="font-family: 'Yahei Microsoft';color: #8e8e8e;line-height: 1.6em;font-size: 16px;font-weight: bold;">
-                                <div>技能要求</div>
+                            <div class="jian-item-content-hidden" id="skill1">
                             </div>
 
                         </div>
 
                         <div class="weui-col-33">
-                            <div class="jian-item-content-hidden" style="text-align: center">
-                                <div id="skill1"></div>
+                            <div class="jian-item-content-hidden" id="skill2">
                             </div>
                         </div>
 
                         <div class="weui-col-33">
-                            <div class="jian-item-content-hidden" style="text-align: right">
-                                <div id="skill2"></div>
+                            <div class="jian-item-content-hidden" id="skill3">
                             </div>
                         </div>
                     </div>
 
-                    <div class="weui-row weui-no-gutter" style="margin-top: 5px;">
+                    <div class="weui-row" style="margin-top: 6px;">
                         <div class="weui-col-33">
-                            <div class="jian-item-content-hidden" style="text-align: left">
-                                <div id="skill3"></div>
+                            <div class="jian-item-content-hidden" id="skill4">
                             </div>
 
                         </div>
 
                         <div class="weui-col-33">
-                            <div class="jian-item-content-hidden" style="text-align: center">
-                                <div id="skill4"></div>
+                            <div class="jian-item-content-hidden" id="skill5">
                             </div>
                         </div>
 
                         <div class="weui-col-33">
-                            <div class="jian-item-content-hidden" style="text-align: right">
-                                <div id="skill5"></div>
+                            <div class="jian-item-content-hidden" id="skill6">
                             </div>
                         </div>
                     </div>
@@ -172,41 +166,48 @@
     skills = skills.split(',');
     for (var i = 0; i < skills.length; i++) {
         if (skills[i] != "") {
-            $("#skill" + (i + 1)).text('[ ' + skills[i] + ' ]');
+            $("#skill" + (i + 1)).text(skills[i]);
+            $("#skill" + (i + 1)).css('border','1px solid #d5d5d5');
         }
     }
 
 
-    var pics = '{{ piclist|safe }}';
-    pics = pics.split(',');
+    var piclist = '{{ piclist|safe }}';
+    pics = piclist.split(',');
 
-    console.log(pics);
-    for (var i = 0; i < 2; i++) {  //先加载前面两张图片
-        if (pics[i] != "") {
-            $("#img" + (i + 1)).attr('src', pics[i]);
-        }
-    }
-    var img_index = 2;
-    if (pics.length >2) {
+    // console.log(piclist);
+    // $('.weui-infinite-scroll').hide();//刚开始隐藏
+    if (piclist=="") {
+        $('.pre_img').remove();
+        $('#load-more').html("∩_∩ 暂无更多图片");
+    } else if (piclist!=""&&pics.length == 1) {
+        $("#img1").attr('src', "http://ugcres.oss-cn-shanghai.aliyuncs.com/" + pics[0]);
+        $("#img2").remove();
+        $('#load-more').html("∩_∩ 暂无更多图片");
+    } else if (pics.length == 2) {
+        $("#img1").attr('src', "http://ugcres.oss-cn-shanghai.aliyuncs.com/" + pics[0]);
+        $("#img2").attr('src', "http://ugcres.oss-cn-shanghai.aliyuncs.com/" + pics[1]);
+        $('#load-more').html("∩_∩ 暂无更多图片");
+    } else {
+        // $('.weui-infinite-scroll').show();
+        $("#img1").attr('src', "http://ugcres.oss-cn-shanghai.aliyuncs.com/" + pics[0]);
+        $("#img2").attr('src', "http://ugcres.oss-cn-shanghai.aliyuncs.com/" + pics[1]);
+        var img_index = 2;
         var loading = false;  //状态标记
         $('.weui_tab_bd').infinite();
         $('.weui_tab_bd').infinite().on("infinite", function () {
-            if (img_index > 5) {
+            if (img_index >= pics.length) {
                 $('#load-more').html("∩_∩ 暂无更多图片")
                 $('.weui_tab_bd').destroyInfinite(); //销毁该组件
                 return
-            }else{
+            } else {
                 if (loading) return;
                 loading = true;
-                var jian_item1 = '<div style="width: 100%;margin-top: 10px;"><img class="pre_img" src="'+pics[img_index++]+'" width="100%"></div>';
-                var jian_item2 = '<div style="width: 100%;margin-top: 10px;"><img class="pre_img" src="'+pics[img_index++]+'" width="100%"></div>';
-                $("#img-view").append(jian_item1).append(jian_item2);
+                var jian_item1 = '<div style="width: 100%;margin-top: 10px;"><img class="pre_img" src="http://ugcres.oss-cn-shanghai.aliyuncs.com/' + pics[img_index++] + '" width="100%"></div>';
+                $("#img-view").append(jian_item1);
                 loading = false;
             }
         })
-    } else {
-        $('.weui-infinite-scroll').css('display', 'none');//刚开始隐藏
-        $(".pre_img").remove();
     }
 
     var jsapi = {{ jsapi|safe }};

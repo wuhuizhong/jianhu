@@ -23,24 +23,21 @@ def index(request):
 		logging.error('Cant find user_id by openid: %s when post_job' % request.openid)
 		return HttpResponse("十分抱歉，获取用户信息失败，请重试。重试失败请联系客服人员")
 
-	profile = get_user_profile_by_user_id(user_id=user_id, need_default=True)
-
 	vip_job_from_point = convert.str_to_int(request.GET.get('from', '0'), 0)  # 有from时，则为翻页，无时，则为首页
 	number_limit = convert.str_to_int(request.GET.get('limit', '10'), 10)  # 异常情况下，或者不传的情况下，默认为10
 	own_job = {}
 	# 取本人发布过的，并且有效的简历
-	if vip_job_from_point == 0:  # 这里是首页；如果大于0就不是首页，不是首页的话，翻页不需要继续找own_job了
+	if vip_job_from_point != 0:  # 不是首页的话，翻页不需要继续找own_jobs了
+		own_job = []
+	else:  # 首页
 		own_jobs = Job.objects.filter(user_id=user_id).order_by('-id')[:1]
-		if own_jobs:
-			own_job_obj = own_jobs[0]
-			own_job['city'] = own_job_obj.city + " " + own_job_obj.district
-			own_job['company_name'] = own_job_obj.company_name
-			own_job['job_title'] = own_job_obj.job_title
-			own_job['education'] = own_job_obj.education
-			own_job['work_experience'] = own_job_obj.work_experience
-			own_job['salary'] = own_job_obj.salary
-			own_job['create_time'] = convert.format_time(own_job_obj.create_time)
-			own_job['job_uuid'] = own_job_obj.uuid
+		if len(own_jobs) == 1:  # 自己发过职位
+			own_job = model_to_dict(own_jobs[0],
+				exclude=['id', 'user_id', 'is_valid', 'create_time', 'update_time', 'city', 'province', 'district',
+				         'piclist', 'skill', ])
+			own_job['city'] = own_jobs[0].city + " " + own_jobs[0].district
+			own_job['create_time'] = convert.format_time(own_jobs[0].create_time)
+			profile = Profile.objects.filter(id=user_id)[0]
 			own_job['username'] = profile.real_name
 			own_job['portrait'] = profile.portrait
 
@@ -50,20 +47,22 @@ def index(request):
 	vip_jobs = Job.objects.filter(id__in=job_id_list)
 	job_list = []
 	for my_job in vip_jobs:
+		profile = Profile.objects.filter(id=my_job.user_id)[0]
+		username = profile.real_name
+		portrait = profile.portrait
 		city = my_job.city + " " + my_job.district
 		job = {'city': city, 'company_name': my_job.company_name, 'job_title': my_job.job_title,
 		       'education': my_job.education, 'work_experience': my_job.work_experience, 'salary': my_job.salary,
-		       'create_time': convert.format_time(my_job.create_time), 'username': profile.real_name, 'portrait': profile.portrait,
+		       'create_time': convert.format_time(my_job.create_time), 'username': username, 'portrait': portrait,
 		       'job_uuid': my_job.uuid}
 		job_list.append(job)
-	
+	job_list.reverse()
 	page_data = {'own_job': json.dumps(own_job), 'job_list': json.dumps(job_list)}
-	# 请把own_job和vip_jobs渲染到页面上
+	# 请把own_jobs和vip_jobs渲染到页面上
 	if vip_job_from_point == 0:  # 首页，需要返回页面
 		return render_to_response('index.html', page_data)
 	else:  # 加载下一页，ajax请求
 		return HttpResponse(json.dumps(job_list), content_type='application/json')
-
 
 @sns_userinfo_with_userinfo
 def msg(request):
@@ -84,7 +83,7 @@ def get_job(request):
 		page_data = model_to_dict(job_details[0], exclude=['id', 'user_id', 'is_valid', 'create_time', 'update_time', ])
 		page_data['time'] = convert.format_time(job_details[0].create_time)
 		page_data['city'] = job_details[0].city + " " + job_details[0].district
-		profile = get_user_profile_by_user_id(user_id=user_id, need_default=True)
+		profile = get_user_profile_by_user_id(user_id=job_details[0].user_id, need_default=True)
 		page_data['username'] = profile.real_name
 		page_data['portrait'] = profile.portrait
 	else:
@@ -139,7 +138,7 @@ def post_job(request):
 		if media_id:
 			url = "http://file.api.weixin.qq.com/cgi-bin/media/get?access_token=%s&media_id=%s" % (
 			access_token, media_id)
-			picname = str_tools.gen_short_uuid() + ".jpg"
+			picname = str_tools.gen_short_uuid()
 			OSSUgcRes.upload_from_url(picname, url)
 			if piclist:
 				piclist = '%s,%s' % (piclist, picname)
@@ -158,7 +157,10 @@ def post_job(request):
 	url = "http://" + request.get_host() + request.path
 	sign = Helper.jsapi_sign(url)
 	sign["appId"] = WxPayConf_pub.APPID
-	return render_to_response('job/job_success.html', {"jsapi": json.dumps(sign)})
+
+	page_data = {}
+	page_data['jsapi'] = json.dumps(sign);
+	return render_to_response('job/job_success.html', page_data)
 
 
 @sns_userinfo_with_userinfo
@@ -169,10 +171,15 @@ def fabu_job(request):
 		logging.error('Cant find user_id by openid: %s when post_job' % request.openid)
 		return HttpResponse("十分抱歉，获取用户信息失败，请重试。重试失败请联系客服人员")
 
+	# job_details = Job.objects.filter(user_id=user_id)[:1]
+	# if not job_details:
+	# 	return HttpResponse("十分抱歉，获取失败,请联系客服人员")
+	#
+	# job_detail = job_details[0]
+
 	page_data = {}
-	job_details = Job.objects.filter(user_id=user_id)[:1]
-	if job_details:
-		page_data = model_to_dict(job_detail[0], exclude=['is_vip', 'is_valid', 'update_time', 'create_time'])
+	# if job_detail:
+	# 	page_data = model_to_dict(job_detail, exclude=['is_vip', 'is_valid', 'update_time', 'create_time'])
 
 	url = "http://" + request.get_host() + request.path
 	sign = Helper.jsapi_sign(url)

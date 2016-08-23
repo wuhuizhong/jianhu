@@ -154,11 +154,11 @@ html, body {
 
 
 /*//增加了一些删格*/
-.weui-row.weui-no-gutter .weui-col-33 {
-  width: 33%;
+.weui-row.weui-no-gutter .weui-col-32 {
+  width: 32%;
 }
-.weui-row.weui-no-gutter .weui-col-23 {
-  width: 23%;
+.weui-row.weui-no-gutter .weui-col-24 {
+  width: 24%;
 }
 .weui-row.weui-no-gutter .weui-col-22 {
   width: 22%;
