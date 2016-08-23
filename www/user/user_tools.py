@@ -55,6 +55,16 @@ def get_userid_by_openid(openid):
     
     return None
 
+def get_user_profile_by_user_id(user_id, need_default):
+    profiles = Profile.objects.filter(id=user_id)[:1]
+    if profiles:
+        return profiles[0]
+    
+    if need_default:
+        return Profile(id=user_id, uuid='', nick='', sex='O', real_name='', portrait='', company_name='', title='', vip=False, desc='')
+    else:
+        return None
+
 def is_vip(user_id):
     profile = Profile.objects.filter(id=user_id)[0]
     if profile and profile.vip:
