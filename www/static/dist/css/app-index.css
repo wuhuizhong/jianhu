@@ -4,16 +4,15 @@ html, body {
     font-family: 'Microsoft YaHei';
 }
 
-
-.jian-title-back{
-    height:30px;
-    width:30px;
+.jian-title-back {
+    height: 30px;
+    width: 30px;
     position: absolute;
     top: 7px;
     left: 11px;
 }
 
-.jian-title-text{
+.jian-title-text {
     width: 100%;
     height: 45px;
     text-align: center;
@@ -22,7 +21,7 @@ html, body {
     line-height: 45px;
 }
 
-.jian-fabu-btn{
+.jian-fabu-btn {
     position: absolute;
     right: 12px;
     bottom: 52px;
@@ -30,42 +29,42 @@ html, body {
     width: 80px;
 }
 
-.jian-item-space{
-	background-color: #ebebeb;
-	width:100%;
-	height: 10px
+.jian-item-space {
+    background-color: #ebebeb;
+    width: 100%;
+    height: 10px
 }
 
-.jian-item-title{
+.jian-item-title {
     padding: 15px 15px 15px 15px;
     background-color: #ffffff;
 }
 
-.jian-item-title-font{
+.jian-item-title-font {
     font-family: 'Microsoft YaHei';
     font-size: 17px;
     color: #2b2e30;
 }
 
-.jian-item-content{
+.jian-item-content {
     margin-top: 12px;
     line-height: 14px;
 }
 
-.jian-item-content-img{
-    vertical-align:text-bottom;
-    height:18px;
-    width:18px;
+.jian-item-content-img {
+    vertical-align: text-bottom;
+    height: 18px;
+    width: 18px;
 }
 
-.jian-item-content-fontyahei{
-	font-family: 'Microsoft YaHei';
-	font-size: 12px;
-	color: #8e8e8e;
-	margin-left: 4px;
+.jian-item-content-fontyahei {
+    font-family: 'Microsoft YaHei';
+    font-size: 12px;
+    color: #8e8e8e;
+    margin-left: 4px;
 }
 
-.jian-item-content-fontxinzi{
+.jian-item-content-fontxinzi {
     /*margin-top: 6px;*/
     line-height: 18px;
     font-family: 'Microsoft YaHei';
@@ -74,34 +73,34 @@ html, body {
     color: #ff9600;
 }
 
-.jian-item-me{
+.jian-item-me {
     margin-top: 15px;
     line-height: 30px
 }
 
-.jian-item-me-img{
-     height:30px;
-     width:30px;
-     vertical-align:middle;
-     border-radius:50%;
-     background-color: #000000;
+.jian-item-me-img {
+    height: 30px;
+    width: 30px;
+    vertical-align: middle;
+    border-radius: 50%;
+    background-color: #000000;
 }
 
-.jian-item-me-fontname{
-	font-family: 'Microsoft YaHei';
-	font-size: 12px;
-	color: #2b2e30;
+.jian-item-me-fontname {
+    font-family: 'Microsoft YaHei';
+    font-size: 12px;
+    color: #2b2e30;
     margin-left: 6px;
 }
-.jian-item-me-fontcompany{
+
+.jian-item-me-fontcompany {
     font-family: 'Microsoft YaHei';
     font-size: 12px;
     color: #8e8e8e;
     margin-top: 8px;
 }
 
-
-.jian-title{
+.jian-title {
     position: fixed;
     height: 45px;
     top: 0;
@@ -109,65 +108,72 @@ html, body {
     left: 0;
     background-color: #ff9600;
 }
-.jian-tabbar-item{
+
+.jian-tabbar-item {
     width: 36px;
-    height:36px;
+    height: 36px;
     margin: 6px auto
 }
 
-
-
-
-
 /*edit-userinfo.css*/
-.jian-form{
-	margin-top: 0px;
-	font-family: 'Microsoft YaHei';
-	overflow-x:hidden;
+.jian-form {
+    margin-top: 0px;
+    font-family: 'Microsoft YaHei';
+    overflow-x: hidden;
 }
-.jian-form-cell{
+
+.jian-form-cell {
     /*margin:0;*/
     font-size: 16px;
 }
 
-.jian-cell-hd{
+.jian-cell-hd {
     width: 145px;
 }
 
-.jian-form-cell:before{
-	/*margin:0;*/
-	left: 0;
-	border-top:1px solid #ebebeb;
+.jian-form-cell:before {
+    /*margin:0;*/
+    left: 0;
+    border-top: 1px solid #ebebeb;
 }
 
-.jian-form-cell-body{
-	text-align: right;
-	color: #8e8e8e;
+.jian-form-cell-body {
+    text-align: right;
+    color: #8e8e8e;
 }
 
-.jian-form-skill{
+.jian-form-skill {
     color: #2b2e30;
     line-height: 28px;
     font-size: 16px;
     /*font-weight: bold;*/
 }
 
+.jian-item-vip {
+    position: absolute;
+    bottom: 0px;
+    left: 0;
+    width: 30px;
+    height: 30px;
+}
 
 /*//增加了一些删格*/
 .weui-row.weui-no-gutter .weui-col-32 {
-  width: 32%;
+    width: 32%;
 }
+
 .weui-row.weui-no-gutter .weui-col-24 {
-  width: 24%;
+    width: 24%;
 }
+
 .weui-row.weui-no-gutter .weui-col-22 {
-  width: 22%;
+    width: 22%;
 }
 
 .weui-row.weui-no-gutter .weui-col-21 {
-  width: 21%;
+    width: 21%;
 }
 
 .weui-row.weui-no-gutter .weui-col-35 {
-  width: 35%;
+    width: 35%;
 }
