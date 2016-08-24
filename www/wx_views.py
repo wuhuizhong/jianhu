@@ -62,21 +62,20 @@ def subscribe(xml):
 @handler.text
 def text(xml):
     content = xml.Content
-    if content == "111":
+    if content == "fulltext":
         return {"Title": "美女", "Description": "比基尼美女",
                 "PicUrl": "http://9smv.com/static/mm/uploads/150411/2-150411115450247.jpg",
                 "Url": "http://9smv.com/beauty/list?category=5"}
-    elif content == "222":
-        return [["比基尼美女", "比基尼美女", "http://9smv.com/static/mm/uploads/150411/2-150411115450247.jpg",
-                 "http://9smv.com/beauty/list?category=5"],
-                ["长腿美女", "长腿美女", "http://9smv.com/static/mm/uploads/150506/2-150506111A9648.jpg",
-                 "http://9smv.com/beauty/list?category=8"]]
     elif content == "push":
         Helper.send_text_message(xml.FromUserName, "推送消息测试")
         return "push ok"
 
     return "hello world"
 
+
+@handler.click
+def click(xml):
+    return "ok"
 
 #加密太简单，要加强这块 －－ 以后注意要修改！！！ guohw
 @sns_userinfo
