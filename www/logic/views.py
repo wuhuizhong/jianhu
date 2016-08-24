@@ -26,6 +26,7 @@ def index(request):
 	vip_job_from_point = convert.str_to_int(request.GET.get('from', '0'), 0)  # 有from时，则为翻页，无时，则为首页
 	number_limit = convert.str_to_int(request.GET.get('limit', '10'), 10)  # 异常情况下，或者不传的情况下，默认为10
 	own_job = {}
+	user_info_map = {}
 	# 取本人发布过的，并且有效的简历
 	if vip_job_from_point != 0:  # 不是首页的话，翻页不需要继续找own_jobs了
 		own_job = []
@@ -41,6 +42,21 @@ def index(request):
 			own_job['username'] = profile.real_name
 			own_job['portrait'] = profile.portrait
 
+			userinfo = {}
+			userinfo['nick'] = own_job['username']
+			userinfo['portrait'] = own_job['portrait']
+			userinfo['user_company'] = profile.company_name
+			userinfo['user_title'] = profile.title
+			userinfo['user_desc'] = profile.desc
+
+			profile_exts = ProfileExt.objects.filter(user_id=user_id)[:1]
+			if not profile_exts:
+				return HttpResponse("十分抱歉，获取用户信息失败，请联系客服人员")
+			profile_ext = profile_exts[0]
+			userinfo['user_city'] = profile_ext.city.split(' ')[1]
+			user_info_map[own_job['uuid']] = userinfo
+
+
 	# 按发布时间去取VIP发布简历 －－ 以后从缓存中取
 	vip_jobs = VipJobList.objects.all().order_by('-pub_time')[vip_job_from_point:number_limit + vip_job_from_point]
 	job_id_list = [job.job_id for job in vip_jobs]
@@ -55,14 +71,31 @@ def index(request):
 		       'education': my_job.education, 'work_experience': my_job.work_experience, 'salary': my_job.salary,
 		       'create_time': convert.format_time(my_job.create_time), 'username': username, 'portrait': portrait,
 		       'job_uuid': my_job.uuid}
+
+		userinfo = {}
+		userinfo['nick'] = profile.real_name
+		userinfo['portrait'] = portrait
+		userinfo['user_company'] = profile.company_name
+		userinfo['user_title'] = profile.title
+		userinfo['user_desc'] = profile.desc
+
+		profile_exts = ProfileExt.objects.filter(user_id=user_id)[:1]
+		if not profile_exts:
+			return HttpResponse("十分抱歉，获取用户信息失败，请联系客服人员")
+		profile_ext = profile_exts[0]
+		userinfo['user_city'] = profile_ext.city.split(' ')[1]
+		user_info_map[my_job.uuid] = userinfo
+
 		job_list.append(job)
 	job_list.reverse()
-	page_data = {'own_job': json.dumps(own_job), 'job_list': json.dumps(job_list)}
+	page_data = {'own_job': json.dumps(own_job), 'job_list': json.dumps(job_list),
+	             'user_info_map': json.dumps(user_info_map)}
 	# 请把own_jobs和vip_jobs渲染到页面上
 	if vip_job_from_point == 0:  # 首页，需要返回页面
 		return render_to_response('index.html', page_data)
 	else:  # 加载下一页，ajax请求
 		return HttpResponse(json.dumps(job_list), content_type='application/json')
+
 
 @sns_userinfo_with_userinfo
 def msg(request):
@@ -88,6 +121,18 @@ def get_job(request):
 		page_data['portrait'] = profile.portrait
 		page_data['user_title'] = profile.title
 		page_data['user_company'] = profile.company_name
+
+		page_data['nick'] = profile.real_name
+		page_data['portrait'] = profile.portrait
+		page_data['user_company'] = profile.company_name
+		page_data['user_title'] = profile.title
+		page_data['user_desc'] = profile.desc
+
+		profile_exts = ProfileExt.objects.filter(user_id=user_id)[:1]
+		if not profile_exts:
+			return HttpResponse("十分抱歉，获取用户信息失败，请联系客服人员")
+		profile_ext = profile_exts[0]
+		page_data['user_city'] = profile_ext.city.split(' ')[1]
 	else:
 		logging.error("uid(%s) try to get not exsit job(%s), maybe attack" % (user_id, job_uuid))
 		return HttpResponse("十分抱歉，获取职位信息失败，请重试。重试失败请联系客服人员")
