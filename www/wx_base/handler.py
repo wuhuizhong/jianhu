@@ -29,8 +29,8 @@ class MessageHandle(object):
         """回调事件"""
         assert type in self.handler
 
-        func = self.handler[type][key]
-        if func:
+        if key in self.handler[type]:
+            func = self.handler[type][key]
             data = func(self.xml)
         else:
             data = 'ok'
