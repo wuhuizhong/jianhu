@@ -69,7 +69,23 @@ def yingpin_detail(request):
 
 @sns_userinfo_with_userinfo
 def edit_userinfo(request):
-	info = {'title': '编辑我的信息', 'tint': '真实信息，有利于相互信任！'}
+	user_id = get_userid_by_openid(request.openid)
+	profiles = Profile.objects.filter(id=user_id)[:1]
+	profile_exts = ProfileExt.objects.filter(user_id=user_id)[:1]
+	if not profiles or not profile_exts:
+		return HttpResponse("十分抱歉，获取用户信息失败，请联系客服人员")
+
+	info = {'title': '编辑资料', 'tint': '真实信息，有利于相互信任！'}
+	profile = profiles[0]
+	info['real_name'] = profile.real_name
+	info['company_name'] = profile.company_name
+	info['user_title'] = profile.title
+	info['desc'] = profile.desc
+
+	profile_ext = profile_exts[0]
+	info['city'] = profile_ext.city
+
+
 	return render_to_response('user/edit_userinfo.html', {'info': json.dumps(info)})
 
 
@@ -85,6 +101,7 @@ def post_userinfo(request):
 		return HttpResponse("十分抱歉，获取用户信息失败，请重试。重试失败请联系客服人员")
 
 	company_name = request.POST.get('company_name')
+	desc = request.POST.get('jianli')
 	title = request.POST.get('title')
 	real_name = request.POST.get('real_name')
 	city = request.POST.get('city')
@@ -98,6 +115,7 @@ def post_userinfo(request):
 	profile.real_name = real_name
 	profile.company_name = company_name
 	profile.title = title
+	profile.desc = desc
 	profile.save()
 
 	# 更新profile_ext表
@@ -107,7 +125,6 @@ def post_userinfo(request):
 		profile_ext.city = city
 		profile_ext.save()
 	return HttpResponseRedirect('/user/me')
-
 
 @sns_userinfo_with_userinfo
 def me(request):
@@ -124,11 +141,11 @@ def me(request):
 	if profile.real_name == '':
 		info = {'title': '完善资料', 'tint': '请先完善您的资料吧！'}
 		return render_to_response('user/edit_userinfo.html', {'info': json.dumps(info)})
-	else:
-		city = ''
-		profile_ext = ProfileExt.objects.filter(user_id=user_id)[:1]
-		if profile_ext:
-			city = profile_ext[0].city
-
-		user = {'nick': profile.real_name, 'portrait': profile.portrait, 'company': profile.company_name, 'city': city}
-		return render_to_response('user/me.html', {'user': json.dumps(user)})
+	profile_exts = ProfileExt.objects.filter(user_id=user_id)[:1]
+	if not profile_exts:
+		return HttpResponse("十分抱歉，获取用户信息失败，请联系客服人员")
+	profile_ext = profile_exts[0]
+	user_city = profile_ext.city.split(' ')[1]
+	user = {'nick': profile.real_name, 'portrait': profile.portrait, 'user_company': profile.company_name,
+	        'user_title': profile.title, 'user_city': user_city, 'user_desc': profile.desc}
+	return render_to_response('user/me.html', {'user': json.dumps(user)})

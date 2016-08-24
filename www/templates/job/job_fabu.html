@@ -243,20 +243,20 @@
                 } else {
                     wx.chooseImage({
                         count: 1, // 默认9
-                        sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
+                        sizeType: ['compressed'], // 可以指定是原图还是压缩图，默认二者都有
                         sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
                         success: function (res) {
                             var localIds = res.localIds;
-                            addImg(_this, localIds[0]);
                             wx.uploadImage({
                                 localId: localIds[0],
                                 isShowProgressTips: 1, // 默认为1，显示进度提示
                                 success: function (res) {
+                                	addImg(_this, localIds[0]);
                                     console.log(img_url);
                                     $('.'+img_url).val(res.serverId); // 返回图片的服务器端ID
                                 },
                                 fail: function(res) {
-                                    $.alert('上传失败');
+                                    $.alert('上传失败，错误原因：'+errMsg);
                                 }
                             });
                         }

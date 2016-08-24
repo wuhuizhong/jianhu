@@ -23,12 +23,13 @@
     <div class="weui_tab_bd" style="margin-top: 0;padding-top: 45px;background-color: #ebebeb;">
         <!--内容区-->
         <div id="content">
-            <div style="font-size: 17px;text-align: center;height: 80px;line-height: 80px;" id="tint">
+            <!-- <div style="font-size: 17px;text-align: center;height: 60px;line-height: 60px;" id="tint">
 
-            </div>
+            </div> -->
 
             <!-- form start -->
             <form id="info_form" method="post" action="/user/post_userinfo">
+                <div class="weui_cells_title">基本信息（必填）</div>
                 <div class="weui_cells weui_cells_form jian-form">
                     <div class="weui_cell jian-form-cell">
                         <div class="weui_cell_hd jian-cell-hd"><label class="weui_label">真实姓名</label></div>
@@ -54,18 +55,21 @@
                         <div class="weui_cell_hd" style="width: 145px;">
                             <label class="weui_label">所在城市</label></div>
                         <div class="weui_cell_bd weui_cell_primary jian-form-cell-body">
-                            <input class="weui_input" name="city" type="text" id='city-picker' value="北京 北京 东城区 "/>
+                            <input class="weui_input" name="city" type="text" id='city-picker'
+                                   value="北京 北京市 东城区 "/>
                         </div>
                     </div>
                 </div>
 
                 <div class="weui_cells_title">微简历（可选填）</div>
-                <div class="weui_cells weui_cells_form" style="margin:0 12px;">
+                <div class="weui_cells weui_cells_form">
                     <div class="weui_cell">
                         <div class="weui_cell_bd weui_cell_primary">
-                            <textarea class="weui_textarea" placeholder="主要技能，主要业绩，工作经历，教育背景等" rows="3"></textarea>
+                            <textarea rows="5" name="jianli" class="weui_textarea" id="jianli"
+                                      style="color: #8e8e8e;font-size: 0.6em;"
+                                      placeholder="主要技能，主要业绩，工作经历，教育背景等" rows="3"></textarea>
 
-                            <div class="weui_textarea_counter"><span>0</span>/200</div>
+                            <div class="weui_textarea_counter"><span id="jianli_count">0</span>/140</div>
                         </div>
                     </div>
                 </div>
@@ -85,16 +89,32 @@
 <script src="http://res.jian-hu.cn/static/jquery-weui/dist/lib/jquery-2.1.4.js"></script>
 <script src="http://res.jian-hu.cn/static/jquery-weui/dist/js/jquery-weui.js"></script>
 <script src="http://res.jian-hu.cn/static/jquery-weui/dist/js/city-picker.min.js"></script>
-
-<script src="http://res.jian-hu.cn/static/dist/js/app-fabu-list.js"></script>
 <script type="text/javascript">
-    var info = {{ info | safe }}
-            $('#title').text(info.title);
-    $('#tint').text(info.tint);
+    var info = {{ info | safe }};
+
+    $('#title').text(info.title);
+    // $('#tint').text(info.tint);
+
+    $('#real_name').val(info.real_name);
+    $('#city-picker').val(info.city);
+    $('#company_name').val(info.company_name);
+    $('#user_title').val(info.user_title);
+    $('#jianli').val(info.desc);
+    $('#jianli_count').text($('#jianli').val().length);
+
+    $('#jianli').bind('input propertychange', function () {
+        if (this.value.length > 140) {
+            this.value = this.value.substr(0, 140);
+            $('#jianli_count').css('color','red');
+        }else{
+            $('#jianli_count').css('color','#b2b2b2');
+        }
+        $('#jianli_count').text($(this).val().length);
+    });
 
     $('#info_submit').on('click', function (event) {
         if ($('#real_name').val() == '') {
-            $.toast("快发给你的同事，同学，朋友，求推荐吧！", "text");
+            $.toast("请输入真实姓名！", "text");
             return;
         }
         if ($('#company_name').val() == '') {
@@ -113,6 +133,18 @@
         showDistrict: true
 
     });
+
+
+    {#    function getCharLength(val) {#}
+    {#        var byteValLen = 0;#}
+    {#        for (var i = 0; i < val.length; i++) {#}
+    {#            if (val[i].match(/[^\x00-\xff]/ig) != null)#}
+    {#                byteValLen += 2;#}
+    {#            else#}
+    {#                byteValLen += 1;#}
+    {#        }#}
+    {#        return byteValLen;#}
+    {#    }#}
 </script>
 
 </body>

@@ -8,6 +8,8 @@ from wx_base import handler
 from wx_base.backends.dj import Helper, sns_userinfo
 from wx_base import WeixinHelper, JsApi_pub, WxPayConf_pub, UnifiedOrder_pub, Notify_pub, catch
 
+from django.views.decorators.csrf import csrf_exempt
+@csrf_exempt
 def wx_io(request):
     """公众平台对接"""
     if request.method == "GET":
@@ -19,9 +21,9 @@ def wx_io(request):
         return HttpResponse(request.GET.get("echostr"))
     elif request.method == "POST":
         if settings.DEBUG:
-            logging.DEBUG(request.raw_post_data)
-        handler = handler.MessageHandle(request.raw_post_data)
-        response = handler.start()
+            print "[WeiXin] Api: ", request.body
+        hd = handler.MessageHandle(request.body)
+        response = hd.start()
         return HttpResponse(response)
     else:
         return HttpResponse("")

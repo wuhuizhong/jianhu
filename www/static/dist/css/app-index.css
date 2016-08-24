@@ -163,9 +163,11 @@ html, body {
 .weui-row.weui-no-gutter .weui-col-22 {
   width: 22%;
 }
-.weui-row.weui-no-gutter .weui-col-22 {
-  width: 22%;
+
+.weui-row.weui-no-gutter .weui-col-21 {
+  width: 21%;
 }
+
 .weui-row.weui-no-gutter .weui-col-35 {
   width: 35%;
 }

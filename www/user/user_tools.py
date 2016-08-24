@@ -49,9 +49,9 @@ sns_userinfo_with_userinfo = sns_userinfo_callback(fetch_user_info_callback)
 
 def get_userid_by_openid(openid):
     if openid:
-        bind = Bind.objects.filter(wx_openid=openid).only('user_id')[0]
-        if bind:
-            return bind.user_id
+        binds = Bind.objects.filter(wx_openid=openid).only('user_id')[:1]
+        if binds:
+            return binds[0].user_id
     
     return None
 
@@ -66,8 +66,8 @@ def get_user_profile_by_user_id(user_id, need_default):
         return None
 
 def is_vip(user_id):
-    profile = Profile.objects.filter(id=user_id)[0]
-    if profile and profile.vip:
+    profiles = Profile.objects.filter(id=user_id)[:1]
+    if profiles and profiles[0].vip:
         return True
 
     return False

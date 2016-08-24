@@ -86,11 +86,13 @@ def get_job(request):
 		profile = get_user_profile_by_user_id(user_id=job_details[0].user_id, need_default=True)
 		page_data['username'] = profile.real_name
 		page_data['portrait'] = profile.portrait
+		page_data['user_title'] = profile.title
+		page_data['user_company'] = profile.company_name
 	else:
 		logging.error("uid(%s) try to get not exsit job(%s), maybe attack" % (user_id, job_uuid))
-		return HttpResponse("十分抱歉，获取用户信息失败，请重试。重试失败请联系客服人员")
+		return HttpResponse("十分抱歉，获取职位信息失败，请重试。重试失败请联系客服人员")
 
-	url = "http://" + request.get_host() + request.path
+	url = "http://" + request.get_host() +request.get_full_path()
 	sign = Helper.jsapi_sign(url)
 	sign["appId"] = WxPayConf_pub.APPID
 	page_data['jsapi'] = json.dumps(sign)
@@ -127,7 +129,7 @@ def post_job(request):
 	for i in range(1, 7):
 		skill = request.POST.get('skill%s' % i)
 		if skill != "":
-			skills += skill+","
+			skills += skill + ","
 	skills = skills[:-1]
 
 	piclist = ''
@@ -138,7 +140,7 @@ def post_job(request):
 		if media_id:
 			url = "http://file.api.weixin.qq.com/cgi-bin/media/get?access_token=%s&media_id=%s" % (
 			access_token, media_id)
-			picname = str_tools.gen_short_uuid()
+			picname = str_tools.gen_short_uuid() + ".jpg"
 			OSSUgcRes.upload_from_url(picname, url)
 			if piclist:
 				piclist = '%s,%s' % (piclist, picname)
@@ -159,8 +161,18 @@ def post_job(request):
 	sign["appId"] = WxPayConf_pub.APPID
 
 	page_data = {}
-	page_data['jsapi'] = json.dumps(sign);
-	return render_to_response('job/job_success.html', page_data)
+	page_data = model_to_dict(job, exclude=['id', 'user_id', 'is_valid', 'create_time', 'update_time', ])
+	page_data['time'] = convert.format_time(job.create_time)
+	page_data['city'] = job.city + " " + job.district
+	profile = Profile.objects.filter(id=job.user_id)[0]
+	page_data['username'] = profile.real_name
+	page_data['portrait'] = profile.portrait
+	page_data['user_title'] = profile.title
+	page_data['user_company'] = profile.company_name
+	page_data['jsapi'] = json.dumps(sign)
+
+	page_data['post_success'] = 1
+	return render_to_response('job/job_detail.html', page_data)
 
 
 @sns_userinfo_with_userinfo
