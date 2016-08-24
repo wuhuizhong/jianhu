@@ -28,7 +28,13 @@ class MessageHandle(object):
     def call(self, type, key):
         """回调事件"""
         assert type in self.handler
-        data = self.handler[type][key](self.xml)
+
+        func = self.handler[type][key]
+        if func:
+            data = func(self.xml)
+        else:
+            data = 'ok'
+        
         response = self.render(data)
         return response
 
