@@ -8,6 +8,8 @@ from wx_base import handler
 from wx_base.backends.dj import Helper, sns_userinfo
 from wx_base import WeixinHelper, JsApi_pub, WxPayConf_pub, UnifiedOrder_pub, Notify_pub, catch
 
+from user.models import WxSubscribe
+
 from django.views.decorators.csrf import csrf_exempt
 @csrf_exempt
 def wx_io(request):
@@ -31,12 +33,29 @@ def wx_io(request):
 
 @handler.subscribe
 def subscribe(xml):
-    return "谢谢订阅，我们应该把信息存储到数据库中： %s" % str(xml)
+    openid = xml.FromUserName
+
+    wxsubscribes = WxSubscribe.objects.filter(wx_openid=openid)[:1]
+    if wxsubscribes:
+        wxsubscribes[0].wx_subscribed = True
+        wxsubscribes[0].save()
+    else:
+        wxsubscribe = WxSubscribe(wx_openid=openid, wx_subscribed=True)
+        wxsubscribe.save()
+
+    return "谢谢订阅，荐乎是XXX，请点击菜单"
 
 
 @handler.unsubscribe
 def subscribe(xml):
-    return "leave brain 取消订阅，我们应该在数据库中体现该事件"
+    openid = xml.FromUserName
+
+    wxsubscribes = WxSubscribe.objects.filter(wx_openid=openid)[:1]
+    if wxsubscribes:
+        wxsubscribes[0].wx_subscribed = False
+        wxsubscribes[0].save()
+
+    return "goodby"
 
 
 #用户发送文本消息到服务器，我们需求进行对接多客服

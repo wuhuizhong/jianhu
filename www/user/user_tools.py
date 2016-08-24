@@ -33,7 +33,7 @@ def fetch_user_info_callback(openid, userinfo):
         profile.save()
 
         bind = Bind(user_id=profile.id, phone_number='', phone_number_verify_time='1972-01-01', wx_openid=openid,
-            wx_openid_verify_time=datetime.datetime.now(), wx_subscribed=0, qq_openid='',
+            wx_openid_verify_time=datetime.datetime.now(),qq_openid='',
             qq_openid_verify_time='1972-01-01', weibo_openid='', weibo_openid_verify_time='1972-01-01', email='',
             email_verify_time='1972-01-01')
         bind.save()
