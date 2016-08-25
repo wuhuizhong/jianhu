@@ -29,6 +29,7 @@
 
             <!-- form start -->
             <form id="info_form" method="post" action="/user/post_userinfo">
+                {% csrf_token %}
                 <div class="weui_cells_title">基本信息（必填）</div>
                 <div class="weui_cells weui_cells_form jian-form">
                     <div class="weui_cell jian-form-cell">

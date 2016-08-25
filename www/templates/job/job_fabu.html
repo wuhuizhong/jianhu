@@ -22,6 +22,7 @@
 
         <!-- form start -->
         <form action="/job/post_job" method="post" class="myform">
+            {% csrf_token %}
             <div class="weui_cells weui_cells_form jian-form">
                 <div class="weui_cell jian-form-cell">
                     <div class="weui_cell_hd jian-cell-hd"><label class="weui_label">公司名称</label></div>
