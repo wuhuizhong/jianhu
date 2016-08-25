@@ -3,7 +3,6 @@
 import json
 import logging
 import datetime
-from django.template import RequestContext 
 from django.template.loader import get_template
 from django.shortcuts import render, render_to_response
 from django.http import HttpResponse, HttpResponseRedirect
@@ -143,7 +142,7 @@ def get_job(request):
 		profile_exts = ProfileExt.objects.filter(user_id=user_id)[:1]
 		if not profile_exts:
 			return HttpResponse("十分抱歉，获取用户信息失败，请联系客服人员")
-		
+
 		profile_ext = profile_exts[0]
             citys = profile_ext.city.split(' ')
             if len(citys) > 1:
