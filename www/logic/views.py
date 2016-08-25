@@ -61,6 +61,11 @@ def index(request):
                             userinfo['user_city'] = profile_ext.city
 			user_info_map[own_job['uuid']] = userinfo
 
+    profile_exts = ProfileExt.objects.filter(user_id=user_id)[:1]
+	if not profile_exts:
+		return HttpResponse("十分抱歉，获取用户信息失败，请联系客服人员")
+
+	city_info = profile_exts[0].city.split(' ')	
 
 	# 按发布时间去取VIP发布简历 －－ 以后从缓存中取
 	vip_jobs = VipJobList.objects.all().order_by('-pub_time')[vip_job_from_point:number_limit + vip_job_from_point]
@@ -84,34 +89,29 @@ def index(request):
 		userinfo['user_title'] = profile.title
 		userinfo['user_desc'] = profile.desc
 
-		profile_exts = ProfileExt.objects.filter(user_id=user_id)[:1]
-		if not profile_exts:
-			return HttpResponse("十分抱歉，获取用户信息失败，请联系客服人员")
-		profile_ext = profile_exts[0]
-                citys = profile_ext.city.split(' ')	
-                if len(citys) > 1:
-                    userinfo['user_city'] = citys[1]
-                else:
-                    userinfo['user_city'] = profile_ext.city
-		user_info_map[my_job.uuid] = userinfo
+        if len(city_info) > 1:
+            userinfo['user_city'] = city_info[1]
+        else:
+            userinfo['user_city'] = profile_exts[0].city
 
+		user_info_map[my_job.uuid] = userinfo
 		job_list.append(job)
+
 	job_list.reverse()
 	page_data = {'own_job': json.dumps(own_job), 'job_list': json.dumps(job_list),
 	             'user_info_map': json.dumps(user_info_map)}
 
-	# 请把own_jobs和vip_jobs渲染到页面上
 	if vip_job_from_point == 0:  # 首页，需要返回页面
-                template = get_template('index.html')
-                return HttpResponse(template.render(page_data, request))
-		#return render_to_response('index.html', page_data, context_instance=RequestContext(request))
+        template = get_template('index.html')
+        return HttpResponse(template.render(page_data, request))
 	else:  # 加载下一页，ajax请求
-		return HttpResponse(json.dumps(job_list), content_type='application/json')
+		return HttpResponse(json.dumps(job_list), content_type='application/json', request)
 
 
 @sns_userinfo_with_userinfo
 def msg(request):
-	return render_to_response('chat/mesg.html', {}, context_instance=RequestContext(request))
+	template = get_template('chat/mesg.html')
+    return HttpResponse(template.render({}, request))
 
 
 @sns_userinfo_with_userinfo
@@ -143,12 +143,13 @@ def get_job(request):
 		profile_exts = ProfileExt.objects.filter(user_id=user_id)[:1]
 		if not profile_exts:
 			return HttpResponse("十分抱歉，获取用户信息失败，请联系客服人员")
+		
 		profile_ext = profile_exts[0]
-                citys = profile_ext.city.split(' ')
-                if len(citys) > 1:
-                    page_data['user_city'] = citys[1]
-                else:
-                    page_data['user_city'] = profile_ext.city
+            citys = profile_ext.city.split(' ')
+            if len(citys) > 1:
+                page_data['user_city'] = citys[1]
+            else:
+                page_data['user_city'] = profile_ext.city
 	else:
 		logging.error("uid(%s) try to get not exsit job(%s), maybe attack" % (user_id, job_uuid))
 		return HttpResponse("十分抱歉，获取职位信息失败，请重试。重试失败请联系客服人员")
@@ -158,12 +159,10 @@ def get_job(request):
 	sign["appId"] = WxPayConf_pub.APPID
 	page_data['jsapi'] = json.dumps(sign)
 
-	return render_to_response('job/job_detail.html', page_data, context_instance=RequestContext(request))
+	template = get_template('job/job_detail.html')
+    return HttpResponse(template.render(page_data, request))
 
 
-# 暂时规避跨站攻击保护
-from django.views.decorators.csrf import csrf_exempt
-@csrf_exempt
 @sns_userinfo_with_userinfo
 def post_job(request):
 	user_id = get_userid_by_openid(request.openid)
@@ -231,9 +230,10 @@ def post_job(request):
 	page_data['user_title'] = profile.title
 	page_data['user_company'] = profile.company_name
 	page_data['jsapi'] = json.dumps(sign)
-
 	page_data['post_success'] = 1
-	return render_to_response('job/job_detail.html', page_data, context_instance=RequestContext(request))
+
+	template = get_template('job/job_detail.html')
+    return HttpResponse(template.render(page_data, request))
 
 
 @sns_userinfo_with_userinfo
@@ -259,19 +259,24 @@ def fabu_job(request):
 	sign["appId"] = WxPayConf_pub.APPID
 
 	page_data['jsapi'] = json.dumps(sign)
-	return render_to_response('job/job_fabu.html', page_data, context_instance=RequestContext(request))
+
+	template = get_template('job/job_fabu.html')
+    return HttpResponse(template.render({}, request))
 
 
 @sns_userinfo_with_userinfo
 def recommand_job(request):
-	return render_to_response('job/job_recommand.html', {}, context_instance=RequestContext(request))
+	template = get_template('job/job_recommand.html')
+    return HttpResponse(template.render({}, request))
 
 
 @sns_userinfo_with_userinfo
 def chat(request):
-	return render_to_response('chat/chat.html', {}, context_instance=RequestContext(request))
+	template = get_template('chat/chat.html')
+    return HttpResponse(template.render({}, request))
 
 
 @sns_userinfo_with_userinfo
 def get_job_luyin(request):
-	return render_to_response('job/job_detail_luyin.html', {}, context_instance=RequestContext(request))
+	template = get_template('job/job_detail_luyin.html')
+    return HttpResponse(template.render({}, request))

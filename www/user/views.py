@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-# from django.db import transaction
 from django.template import RequestContext 
+from django.template.loader import get_template
 from django.shortcuts import render, render_to_response
 from django.http import HttpResponse, HttpResponseRedirect
 import logging, json
@@ -12,12 +12,14 @@ from common import convert, str_tools
 
 @sns_userinfo_with_userinfo
 def recommand_list(request):
-	return render_to_response('user/recommand_list.html', {}, context_instance=RequestContext(request))
+	template = get_template('user/recommand_list.html')
+    return HttpResponse(template.render({}, request))
 
 
 @sns_userinfo_with_userinfo
 def collection_list(request):
-	return render_to_response('user/collection_list.html', {}, context_instance=RequestContext(request))
+	template = get_template('user/collection_list.html')
+    return HttpResponse(template.render({}, request))
 
 
 @sns_userinfo_with_userinfo
@@ -37,34 +39,40 @@ def fabu_list(request):
 		       'create_time': convert.format_time(my_job.create_time), 'username': username, 'portrait': portrait}
 		job_list.append(job)
 	if job_from_point == 0:  # 首页，需要返回页面
-		return render_to_response('user/fabu_list.html', {'job_list': json.dumps(job_list)}, context_instance=RequestContext(request))
+		template = get_template('user/fabu_list.html')
+	    return HttpResponse(template.render({'job_list': json.dumps(job_list)}, request))
 	else:  # 加载下一页，ajax请求
 		return HttpResponse(json.dumps(job_list), content_type='application/json')
 
 
 @sns_userinfo_with_userinfo
 def yinping_list(request):
-	return render_to_response('user/yinping_list.html', {}, context_instance=RequestContext(request))
+	template = get_template('user/yinping_list.html')
+    return HttpResponse(template.render({}, request))
 
 
 @sns_userinfo_with_userinfo
 def recommand_detail(request):
-	return render_to_response('user/recommand_detail.html', {}, context_instance=RequestContext(request))
+	template = get_template('user/recommand_detail.html')
+    return HttpResponse(template.render({}, request))
 
 
 @sns_userinfo_with_userinfo
 def collection_detail(request):
-	return render_to_response('user/collection_detail.html', {}, context_instance=RequestContext(request))
+	template = get_template('user/collection_detail.html')
+    return HttpResponse(template.render({}, request))
 
 
 @sns_userinfo_with_userinfo
 def fabu_detail(request):
-	return render_to_response('user/fabu_detail.html', {}, context_instance=RequestContext(request))
+	template = get_template('user/fabu_detail.html')
+    return HttpResponse(template.render({}, request))
 
 
 @sns_userinfo_with_userinfo
 def yingpin_detail(request):
-	return render_to_response('chat/chat.html', {}, context_instance=RequestContext(request))
+	template = get_template('chat/chat.html')
+    return HttpResponse(template.render({}, request))
 
 
 @sns_userinfo_with_userinfo
@@ -85,11 +93,10 @@ def edit_userinfo(request):
 	profile_ext = profile_exts[0]
 	info['city'] = profile_ext.city
 
-	return render_to_response('user/edit_userinfo.html', {'info': json.dumps(info)}, context_instance=RequestContext(request))
+	template = get_template('user/edit_userinfo.html')
+    return HttpResponse(template.render({'info': json.dumps(info)},, request))
 
 
-from django.views.decorators.csrf import csrf_exempt
-@csrf_exempt
 @sns_userinfo_with_userinfo
 def post_userinfo(request):
 	user_id = get_userid_by_openid(request.openid)
@@ -118,10 +125,11 @@ def post_userinfo(request):
 	# 更新profile_ext表
 	profile_exts = ProfileExt.objects.filter(user_id=user_id)[:1]
 	if profile_exts:
-		profile_ext = profile_exts[0]
-		profile_ext.city = city
-		profile_ext.save()
+		profile_exts[0].city = city
+		profile_exts[0].save()
+	
 	return HttpResponseRedirect('/user/me')
+
 
 @sns_userinfo_with_userinfo
 def me(request):
@@ -145,5 +153,7 @@ def me(request):
 	user_city = profile_ext.city.split(' ')[1]
 	user = {'nick': profile.real_name, 'portrait': profile.portrait, 'user_company': profile.company_name,
 	        'user_title': profile.title, 'user_city': user_city, 'user_desc': profile.desc}
-	return render_to_response('user/me.html', {'user': json.dumps(user)}, context_instance=RequestContext(request))
+
+	template = get_template('user/me.html')
+    return HttpResponse(template.render({'user': json.dumps(user)}, request))
 
