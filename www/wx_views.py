@@ -2,15 +2,15 @@
 import time
 import logging
 import settings
-from django.template import RquestContext 
+from django.template import RequestContext 
 from django.shortcuts import HttpResponse, render_to_response
 from wx_base import handler
 from wx_base.backends.dj import Helper, sns_userinfo
 from wx_base import WeixinHelper, JsApi_pub, WxPayConf_pub, UnifiedOrder_pub, Notify_pub, catch
 from user.models import WxSubscribe
 
-#from django.views.decorators.csrf import csrf_exempt
-#@csrf_exempt
+from django.views.decorators.csrf import csrf_exempt
+@csrf_exempt
 def wx_io(request):
     """公众平台对接"""
     if request.method == "GET":
@@ -25,9 +25,9 @@ def wx_io(request):
             print "[WeiXin] Api: ", request.body
         hd = handler.MessageHandle(request.body)
         response = hd.start()
-        return HttpResponse(response, {}, context_instance=RequestContext(request))
+        return HttpResponse(response)
     else:
-        return HttpResponse("", {}, context_instance=RequestContext(request))
+        return HttpResponse("")
 
 
 @handler.subscribe

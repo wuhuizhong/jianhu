@@ -3,7 +3,8 @@
 import json
 import logging
 import datetime
-from django.template import RquestContext 
+from django.template import RequestContext 
+from django.template.loader import get_template
 from django.shortcuts import render, render_to_response
 from django.http import HttpResponse, HttpResponseRedirect
 from django.forms.models import model_to_dict
@@ -53,7 +54,11 @@ def index(request):
 			if not profile_exts:
 				return HttpResponse("十分抱歉，获取用户信息失败，请联系客服人员")
 			profile_ext = profile_exts[0]
-			userinfo['user_city'] = profile_ext.city.split(' ')[1]
+                        citys = profile_ext.city.split(' ')
+                        if len(citys) > 1:
+                            userinfo['user_city'] = citys[1]
+                        else:
+                            userinfo['user_city'] = profile_ext.city
 			user_info_map[own_job['uuid']] = userinfo
 
 
@@ -83,16 +88,23 @@ def index(request):
 		if not profile_exts:
 			return HttpResponse("十分抱歉，获取用户信息失败，请联系客服人员")
 		profile_ext = profile_exts[0]
-		userinfo['user_city'] = profile_ext.city.split(' ')[1]
+                citys = profile_ext.city.split(' ')	
+                if len(citys) > 1:
+                    userinfo['user_city'] = citys[1]
+                else:
+                    userinfo['user_city'] = profile_ext.city
 		user_info_map[my_job.uuid] = userinfo
 
 		job_list.append(job)
 	job_list.reverse()
 	page_data = {'own_job': json.dumps(own_job), 'job_list': json.dumps(job_list),
 	             'user_info_map': json.dumps(user_info_map)}
+
 	# 请把own_jobs和vip_jobs渲染到页面上
 	if vip_job_from_point == 0:  # 首页，需要返回页面
-		return render_to_response('index.html', page_data, context_instance=RequestContext(request))
+                template = get_template('index.html')
+                return HttpResponse(template.render(page_data, request))
+		#return render_to_response('index.html', page_data, context_instance=RequestContext(request))
 	else:  # 加载下一页，ajax请求
 		return HttpResponse(json.dumps(job_list), content_type='application/json')
 
@@ -132,7 +144,11 @@ def get_job(request):
 		if not profile_exts:
 			return HttpResponse("十分抱歉，获取用户信息失败，请联系客服人员")
 		profile_ext = profile_exts[0]
-		page_data['user_city'] = profile_ext.city.split(' ')[1]
+                citys = profile_ext.city.split(' ')
+                if len(citys) > 1:
+                    page_data['user_city'] = citys[1]
+                else:
+                    page_data['user_city'] = profile_ext.city
 	else:
 		logging.error("uid(%s) try to get not exsit job(%s), maybe attack" % (user_id, job_uuid))
 		return HttpResponse("十分抱歉，获取职位信息失败，请重试。重试失败请联系客服人员")

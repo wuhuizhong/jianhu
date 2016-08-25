@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # from django.db import transaction
-from django.template import RquestContext 
+from django.template import RequestContext 
 from django.shortcuts import render, render_to_response
 from django.http import HttpResponse, HttpResponseRedirect
 import logging, json
