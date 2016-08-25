@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
 
-def jsapi_sign_wrapper(func):
-    def wrapper():
-        func()
-    return wrapper
+from wx_base import WxPayConf_pub
+from wx_base.backends.dj import Helper
+
+
+def jsapi_sign(request):
+    url = "http://" + request.get_host() + request.path
+    sign = Helper.jsapi_sign(url)
+    sign["appId"] = WxPayConf_pub.APPID
+    return json.dumps(sign)

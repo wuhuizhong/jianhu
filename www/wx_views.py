@@ -2,7 +2,6 @@
 import time
 import logging
 import settings
-from django.template import RequestContext 
 from django.shortcuts import HttpResponse, render_to_response
 from wx_base import handler
 from wx_base.backends.dj import Helper, sns_userinfo

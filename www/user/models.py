@@ -16,6 +16,10 @@ class Profile(models.Model):
     title = models.CharField(max_length=30)
     vip = models.BooleanField(default=False)
     desc = models.CharField(max_length=150, default='')
+    nation = models.CharField(max_length=20, default='')
+    province = models.CharField(max_length=10, default='')
+    city = models.CharField(max_length=20, default='')
+    district = models.CharField(max_length=20, default='')
     ################# 以上是概要信息部分 #####
     update_time = models.DateTimeField(auto_now=True)
     create_time = models.DateTimeField(auto_now_add=True)
@@ -30,13 +34,9 @@ class Profile(models.Model):
 class ProfileExt(models.Model):
     user_id = models.IntegerField(db_index=True)
     education = models.CharField(max_length=40)
-    nation = models.CharField(max_length=20)
     blood_type = models.CharField(max_length=3)
     birthday = models.DateField()
     certificate_no = models.CharField(max_length=40)
-    street = models.CharField(max_length=40)
-    province = models.CharField(max_length=10)
-    city = models.CharField(max_length=20)
     update_time = models.DateTimeField(auto_now=True)
     create_time = models.DateTimeField(auto_now_add=True)
 

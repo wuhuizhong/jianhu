@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from django.template import RequestContext  
 from django.template.loader import get_template
 from django.shortcuts import render, render_to_response
 from django.http import HttpResponse, HttpResponseRedirect
@@ -25,19 +24,22 @@ def collection_list(request):
 @sns_userinfo_with_userinfo
 def fabu_list(request):
     user_id = get_userid_by_openid(request.openid)
+    if not user_id:
+        return HttpResponse("十分抱歉，获取用户信息失败，请重试。重试失败请联系客服人员")
+
     job_from_point = convert.str_to_int(request.GET.get('from', '0'), 0)  # 有from时，则为翻页，无时，则为首页
     number_limit = convert.str_to_int(request.GET.get('limit', '10'), 10)  # 异常情况下，或者不传的情况下，默认为10
     jobs = Job.objects.filter(user_id=user_id).order_by('-id')[job_from_point:number_limit + job_from_point]
+
     job_list = []
     profile = Profile.objects.filter(id=user_id)[0]
-    username = profile.real_name
-    portrait = profile.portrait
     for my_job in jobs:
-        city = my_job.city+" "+my_job.district
+        city = my_job.city + " " + my_job.district
         job = {'city': city, 'company_name': my_job.company_name, 'job_title': my_job.job_title,
                'education': my_job.education, 'work_experience': my_job.work_experience, 'salary': my_job.salary,
-               'create_time': convert.format_time(my_job.create_time), 'username': username, 'portrait': portrait}
+               'create_time': convert.format_time(my_job.create_time), 'username': profile.real_name, 'portrait': profile.portrait}
         job_list.append(job)
+
     if job_from_point == 0:  # 首页，需要返回页面
         template = get_template('user/fabu_list.html')
         return HttpResponse(template.render({'job_list': json.dumps(job_list)}, request))
@@ -78,20 +80,21 @@ def yingpin_detail(request):
 @sns_userinfo_with_userinfo
 def edit_userinfo(request):
     user_id = get_userid_by_openid(request.openid)
+    if not user_id:
+        return HttpResponse("十分抱歉，获取用户信息失败，请重试。重试失败请联系客服人员")
+
     profiles = Profile.objects.filter(id=user_id)[:1]
-    profile_exts = ProfileExt.objects.filter(user_id=user_id)[:1]
-    if not profiles or not profile_exts:
+    if not profiles:
         return HttpResponse("十分抱歉，获取用户信息失败，请联系客服人员")
 
-    info = {'title': '编辑资料', 'tint': '真实信息，有利于相互信任！'}
     profile = profiles[0]
+
+    info = {'title': '编辑资料', 'tint': '真实信息，有利于相互信任！'}
     info['real_name'] = profile.real_name
     info['company_name'] = profile.company_name
     info['user_title'] = profile.title
     info['desc'] = profile.desc
-
-    profile_ext = profile_exts[0]
-    info['city'] = profile_ext.city
+    info['city'] = profile.city
 
     template = get_template('user/edit_userinfo.html')
     return HttpResponse(template.render({'info': json.dumps(info)}, request))
@@ -101,7 +104,6 @@ def edit_userinfo(request):
 def post_userinfo(request):
     user_id = get_userid_by_openid(request.openid)
     if not user_id:
-        logging.error('Cant find user_id by openid: %s when post_job' % request.openid)
         return HttpResponse("十分抱歉，获取用户信息失败，请重试。重试失败请联系客服人员")
 
     company_name = request.POST.get('company_name')
@@ -120,14 +122,9 @@ def post_userinfo(request):
     profile.company_name = company_name
     profile.title = title
     profile.desc = desc
+    profile.city = city
     profile.save()
 
-    # 更新profile_ext表
-    profile_exts = ProfileExt.objects.filter(user_id=user_id)[:1]
-    if profile_exts:
-        profile_exts[0].city = city
-        profile_exts[0].save()
-    
     return HttpResponseRedirect('/user/me')
 
 
@@ -135,7 +132,6 @@ def post_userinfo(request):
 def me(request):
     user_id = get_userid_by_openid(request.openid)
     if not user_id:
-        logging.error('Cant find user_id by openid: %s when post_job' % request.openid)
         return HttpResponse("十分抱歉，获取用户信息失败，请重试。重试失败请联系客服人员")
 
     profiles = Profile.objects.filter(id=user_id)[:1]
@@ -148,14 +144,8 @@ def me(request):
         template = get_template('user/edit_userinfo.html')
         return HttpResponse(template.render({'info': json.dumps(info)}, request))
 
-    profile_exts = ProfileExt.objects.filter(user_id=user_id)[:1]
-    if not profile_exts:
-        return HttpResponse("十分抱歉，获取用户信息失败，请联系客服人员")
-    profile_ext = profile_exts[0]
-    #user_city = profile_ext.city.split(' ')[1]
-    user_city = ""
     user = {'nick': profile.real_name, 'portrait': profile.portrait, 'user_company': profile.company_name,
-            'user_title': profile.title, 'user_city': user_city, 'user_desc': profile.desc}
+            'user_title': profile.title, 'user_city': profile.city, 'user_desc': profile.desc}
 
     template = get_template('user/me.html')
     return HttpResponse(template.render({'user': json.dumps(user)}, request))

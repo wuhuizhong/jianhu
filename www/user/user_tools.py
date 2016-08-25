@@ -29,17 +29,16 @@ def fetch_user_info_callback(openid, userinfo):
                 sex = 'F'
 
         profile = Profile(uuid=gen_uuid(), nick=userinfo['nickname'], sex=sex, portrait=userinfo['headimgurl'],
-            real_name='', company_name='', title='', vip='1')
+            real_name='', company_name='', title='', vip='1', desc='', nation=userinfo['country'], province=userinfo['province'], city=userinfo['city'], district='')
         profile.save()
 
         bind = Bind(user_id=profile.id, phone_number='', phone_number_verify_time='1972-01-01', wx_openid=openid,
-            wx_openid_verify_time=datetime.datetime.now(),qq_openid='',
+            wx_openid_verify_time=datetime.datetime.now(), qq_openid='',
             qq_openid_verify_time='1972-01-01', weibo_openid='', weibo_openid_verify_time='1972-01-01', email='',
             email_verify_time='1972-01-01')
         bind.save()
 
-        profileext = ProfileExt(user_id=profile.id, education='', nation=userinfo['country'], blood_type='',
-            birthday='1972-01-01', certificate_no='', street='', province=userinfo['province'], city=userinfo['city'])
+        profileext = ProfileExt(user_id=profile.id, education='', blood_type='', birthday='1972-01-01', certificate_no='')
         profileext.save()
     else:
         logging.debug('exist userinfo: %s' % openid)
@@ -61,7 +60,7 @@ def get_user_profile_by_user_id(user_id, need_default):
         return profiles[0]
     
     if need_default:
-        return Profile(id=user_id, uuid='', nick='', sex='O', real_name='', portrait='', company_name='', title='', vip=False, desc='')
+        return Profile(id=user_id, uuid='', nick='', sex='O', real_name='', portrait='', company_name='', title='', vip=False, desc='', nation='', province='', city='', district='')
     else:
         return None
 
