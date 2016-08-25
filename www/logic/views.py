@@ -45,11 +45,11 @@ def index(request):
             own_job = {'city': my_job.city + " " + my_job.district, 'company_name': my_job.company_name, 'job_title': my_job.job_title,
                'education': my_job.education, 'work_experience': my_job.work_experience, 'salary': my_job.salary,
                'create_time': convert.format_time(my_job.create_time), 'username': profile.real_name, 'portrait': profile.portrait,
-               'job_uuid': my_job.uuid}
+               'uuid': my_job.uuid}
 
             userinfo = {'nick': profile.real_name, 'portrait':profile.portrait, 'user_company':profile.company_name, 'user_title':profile.title, 'user_desc':profile.desc, 'user_city':profile.city}
 
-            user_info_map[own_job['uuid']] = userinfo
+            user_info_map[my_job.uuid] = userinfo
 
     # 按发布时间去取VIP发布简历 －－ 以后从缓存中取
     vip_jobs = VipJobList.objects.all().order_by('-pub_time')[vip_job_from_point:number_limit + vip_job_from_point]
@@ -71,9 +71,9 @@ def index(request):
         userinfo = {'nick':profile.real_name, 'portrait':profile.portrait, 'user_company':profile.company_name, 'user_title':profile.title, 'user_desc':profile.desc}
 
         if len(city_info) > 1:
-            userinfo['user_city'] = profile_list.city
+            userinfo['user_city'] = profile_list[0].city
         else:
-            userinfo['user_city'] = profile_list.city
+            userinfo['user_city'] = profile_list[0].city
 
         user_info_map[my_job.uuid] = userinfo
         job_list.append(job)
@@ -121,16 +121,7 @@ def get_job(request):
         page_data['user_title'] = profile.title
         page_data['user_desc'] = profile.desc
 
-        profile_exts = ProfileExt.objects.filter(user_id=user_id)[:1]
-        if not profile_exts:
-            return HttpResponse("十分抱歉，获取用户信息失败，请联系客服人员")
-
-        profile_ext = profile_exts[0]
-        citys = profile_ext.city.split(' ')
-        if len(citys) > 1:
-            page_data['user_city'] = citys[1]
-        else:
-            page_data['user_city'] = profile_ext.city
+        page_data['user_city'] = profile.city
     else:
         logging.error("uid(%s) try to get not exsit job(%s), maybe attack" % (user_id, job_uuid))
         return HttpResponse("十分抱歉，获取职位信息失败，请重试。重试失败请联系客服人员")
@@ -147,7 +138,7 @@ def post_job(request):
         logging.error('Cant find user_id by openid: %s when post_job' % request.openid)
         return HttpResponse("十分抱歉，获取用户信息失败，请重试。重试失败请联系客服人员")
 
-    profile = get_user_profile_by_user_id(user_id=job_details[0].user_id, need_default=False)
+    profile = get_user_profile_by_user_id(user_id=user_id, need_default=False)
     if not user_id:
         logging.error('Cant find user profile by user_id: %s when post_job' % user_id)
         return HttpResponse("十分抱歉，获取用户信息失败，请重试。重试失败请联系客服人员")

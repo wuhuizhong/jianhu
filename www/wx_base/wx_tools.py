@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import json
 from wx_base import WxPayConf_pub
 from wx_base.backends.dj import Helper
 
