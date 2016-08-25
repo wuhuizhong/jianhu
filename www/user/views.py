@@ -5,7 +5,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 import logging, json
 from user.models import Bind, Profile, ProfileExt
 from logic.models import Job
-from user_tools import sns_userinfo_with_userinfo, get_userid_by_openid
+from user_tools import sns_userinfo_with_userinfo, get_userid_by_openid, get_user_profile_by_user_id
 from common import convert, str_tools
 
 
@@ -27,12 +27,16 @@ def fabu_list(request):
     if not user_id:
         return HttpResponse("十分抱歉，获取用户信息失败，请重试。重试失败请联系客服人员")
 
+    profile = get_user_profile_by_user_id(user_id=user_id, need_default=False)
+    if not profile:
+        logging.error('Cant find user profile by user_id: %s when fabu_list' % user_id)
+        return HttpResponse("十分抱歉，获取用户信息失败，请重试。重试失败请联系客服人员")
+
     job_from_point = convert.str_to_int(request.GET.get('from', '0'), 0)  # 有from时，则为翻页，无时，则为首页
     number_limit = convert.str_to_int(request.GET.get('limit', '10'), 10)  # 异常情况下，或者不传的情况下，默认为10
     jobs = Job.objects.filter(user_id=user_id).order_by('-id')[job_from_point:number_limit + job_from_point]
 
     job_list = []
-    profile = Profile.objects.filter(id=user_id)[0]
     for my_job in jobs:
         city = my_job.city + " " + my_job.district
         job = {'city': city, 'company_name': my_job.company_name, 'job_title': my_job.job_title,
@@ -83,11 +87,10 @@ def edit_userinfo(request):
     if not user_id:
         return HttpResponse("十分抱歉，获取用户信息失败，请重试。重试失败请联系客服人员")
 
-    profiles = Profile.objects.filter(id=user_id)[:1]
-    if not profiles:
-        return HttpResponse("十分抱歉，获取用户信息失败，请联系客服人员")
-
-    profile = profiles[0]
+    profile = get_user_profile_by_user_id(user_id=user_id, need_default=False)
+    if not profile:
+        logging.error('Cant find user profile by user_id: %s when edit_userinfo' % user_id)
+        return HttpResponse("十分抱歉，获取用户信息失败，请重试。重试失败请联系客服人员")
 
     info = {'title': '编辑资料', 'tint': '真实信息，有利于相互信任！'}
     info['real_name'] = profile.real_name
@@ -106,23 +109,16 @@ def post_userinfo(request):
     if not user_id:
         return HttpResponse("十分抱歉，获取用户信息失败，请重试。重试失败请联系客服人员")
 
-    company_name = request.POST.get('company_name')
-    desc = request.POST.get('jianli')
-    title = request.POST.get('title')
-    real_name = request.POST.get('real_name')
-    city = request.POST.get('city')
+    profile = get_user_profile_by_user_id(user_id=user_id, need_default=False)
+    if not profile:
+        logging.error('Cant find user profile by user_id: %s when post_userinfo' % user_id)
+        return HttpResponse("十分抱歉，获取用户信息失败，请重试。重试失败请联系客服人员")
 
-    # 更新profile表 ,更新两个表应该用事务，这里暂时放下
-    profiles = Profile.objects.filter(id=user_id)[:1]
-    if not profiles:
-        return HttpResponse("十分抱歉，获取用户信息失败，请联系客服人员")
-
-    profile = profiles[0]
-    profile.real_name = real_name
-    profile.company_name = company_name
-    profile.title = title
-    profile.desc = desc
-    profile.city = city
+    profile.real_name = request.POST.get('real_name')
+    profile.company_name = request.POST.get('company_name')
+    profile.title = request.POST.get('title')
+    profile.desc = request.POST.get('jianli')
+    profile.city = request.POST.get('city')
     profile.save()
 
     return HttpResponseRedirect('/user/me')
@@ -134,11 +130,11 @@ def me(request):
     if not user_id:
         return HttpResponse("十分抱歉，获取用户信息失败，请重试。重试失败请联系客服人员")
 
-    profiles = Profile.objects.filter(id=user_id)[:1]
-    if not profiles:
-        return HttpResponse("十分抱歉，获取用户信息失败，请联系客服人员")
-
-    profile = profiles[0]
+    profile = get_user_profile_by_user_id(user_id=user_id, need_default=False)
+    if not profile:
+        logging.error('Cant find user profile by user_id: %s when me' % user_id)
+        return HttpResponse("十分抱歉，获取用户信息失败，请重试。重试失败请联系客服人员")
+    
     if profile.real_name == '':
         info = {'title': '完善资料', 'tint': '请先完善您的资料吧！'}
         template = get_template('user/edit_userinfo.html')
